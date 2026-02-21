@@ -1,0 +1,277 @@
+.page {
+  min-height: 100vh;
+  background: #f6f7f9;
+  padding: 24px;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color: #111;
+}
+
+.header {
+  max-width: 100%;
+  margin: 0 0 16px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 650;
+  color: #111;
+}
+
+.sub {
+  margin: 4px 0 0 0;
+  color: #5b616a;
+  font-size: 13px;
+}
+
+.headerActions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.btn.solid {
+  background: #111;
+  color: white;
+}
+
+.btn.ghost {
+  background: white;
+  border-color: #e4e6ea;
+  color: #111;
+}
+
+.gridTop,
+.gridMid,
+.gridBottom {
+  max-width: 1100px;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.gridTop {
+  grid-template-columns: 1fr;
+}
+
+.gridMid {
+  margin-top: 14px;
+  grid-template-columns: 1fr;
+}
+
+.gridBottom {
+  margin-top: 14px;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 900px) {
+  .gridTop {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .gridMid {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .gridBottom {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+  .span2 {
+    grid-column: span 2;
+  }
+}
+
+.card {
+  background: white;
+  border: 1px solid #e6e8ee;
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+  min-height: 140px;
+}
+
+.cardTitle {
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 10px;
+}
+
+.placeholder {
+  color: #6b7280;
+  font-size: 13px;
+  background: #f6f7f9;
+  border: 1px dashed #d7dbe3;
+  border-radius: 12px;
+  padding: 12px;
+}
+/* --- Today Card --- */
+.nextUp {
+  border: 1px solid #e6e8ee;
+  background: #f6f7f9;
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+.nextUpLabel {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.nextUpTitle {
+  font-size: 14px;
+  font-weight: 650;
+  color: #111;
+}
+
+.nextUpMeta {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+.todayList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.todayRow {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #e6e8ee;
+  background: white;
+}
+
+.todayRow.next {
+  border-color: #111;
+}
+
+.todayTime {
+  font-size: 12px;
+  color: #6b7280;
+  width: 76px;
+  flex: 0 0 76px;
+}
+
+.todayMain {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.todayTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.25;
+}
+
+.tag {
+  display: inline-flex;
+  width: fit-content;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.todayActions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+/* smaller buttons inside cards */
+.btn.small {
+  padding: 8px 10px;
+  font-size: 12px;
+  border-radius: 10px;
+}
+/* --- Weekly Hours Card --- */
+.hoursBig {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.hoursBigNum {
+  font-size: 28px;
+  font-weight: 750;
+  letter-spacing: -0.5px;
+  color: #111;
+}
+
+.hoursBigLabel {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.hoursStats {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.statRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+}
+
+.statLabel {
+  color: #6b7280;
+}
+
+.statValue {
+  color: #111;
+  font-weight: 600;
+}
+
+.stackBar {
+  height: 10px;
+  width: 100%;
+  background: #eef0f4;
+  border-radius: 999px;
+  overflow: hidden;
+  display: flex;
+  margin-bottom: 10px;
+  border: 1px solid #e6e8ee;
+}
+
+.seg {
+  height: 100%;
+}
+
+.seg.study {
+  background: #111;
+}
+.seg.hobby {
+  background: #9ca3af;
+}
+.seg.buffer {
+  background: #d1d5db;
+}
+
+.goalLine {
+  font-size: 12px;
+  color: #6b7280;
+}

@@ -1,0 +1,270 @@
+/* Full app shell */
+.shell {
+  min-height: 100vh;
+  background: #f6f7f9;
+  color: #111;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* Top bar */
+.topbar {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  background: #ffffff;
+  border-bottom: 1px solid #e6e8ee;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brandIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #ede9fe;
+  display: grid;
+  place-items: center;
+  font-size: 16px;
+}
+
+.brandName {
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btnPrimary, .btnGhost {
+  border-radius: 10px;
+  padding: 9px 12px;
+  font-size: 13px;
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.btnPrimary {
+  background: #6d28d9; /* purple-ish like screenshot */
+  color: white;
+}
+
+.btnGhost {
+  background: #ffffff;
+  border-color: #e6e8ee;
+  color: #111;
+}
+
+.userArea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.userName {
+  font-size: 13px;
+  color: #374151;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  background: #111;
+  color: white;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* Workspace columns */
+.workspace {
+  padding: 18px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr; /* mobile */
+}
+
+@media (min-width: 1100px) {
+  .workspace {
+    grid-template-columns: 1.15fr 1.6fr 1.15fr; /* left, middle, right */
+    align-items: start;
+  }
+}
+
+/* Panels */
+.panel {
+  background: white;
+  border: 1px solid #e6e8ee;
+  border-radius: 16px;
+  box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+  overflow: hidden;
+  min-height: 520px;
+}
+
+.panelHeader {
+  padding: 14px 14px 10px 14px;
+  border-bottom: 1px solid #eef0f4;
+}
+
+.panelTitle {
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.panelSubtitle {
+  margin-top: 4px;
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.panelBody {
+  padding: 14px;
+}
+
+.placeholderBox {
+  border: 1px dashed #d7dbe3;
+  background: #f6f7f9;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid #e6e8ee;
+}
+.pill.ok { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+.pill.warn { background: #fff7ed; border-color: #fed7aa; color: #9a3412; }
+
+.syncActions { margin-top: 10px; display: flex; gap: 10px; }
+.tinyNote { margin-top: 10px; font-size: 12px; color: #6b7280; }
+
+.eventList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.eventRow {
+  border: 1px solid #e6e8ee;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.eventTime {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.eventTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+}
+.eventGroupList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.eventDayHeader {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 8px;
+}
+/* --- Mini month calendar --- */
+.miniCal {
+  width: 100%;
+}
+
+.miniCalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.miniCalTitle {
+  font-weight: 700;
+  font-size: 13px;
+  color: #111;
+}
+
+.miniCalNav {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid #e6e8ee;
+  background: white;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.miniCalDow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.miniCalDowCell {
+  font-size: 11px;
+  color: #6b7280;
+  text-align: center;
+}
+
+.miniCalGrid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+}
+
+.miniCalCell {
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: center;
+}
+
+.miniCalCell.empty {
+  cursor: default;
+}
+
+.miniCalCell.day:hover {
+  background: #f3f4f6;
+  border-color: #e6e8ee;
+}
+
+.miniCalCell.day.today {
+  border-color: #e6e8ee;
+}
+
+.miniCalCell.day.selected {
+  background: #6d28d9;
+  color: white;
+  font-weight: 700;
+  border-color: #6d28d9;
+}
