@@ -175,6 +175,8 @@ async function aiOptimizeAllocation({ subjects, windowStartISO, windowEndISO }) 
 // Constraint-safe scheduler that uses AI priorities
 
 function scheduleFromFreeSlots({ events, aiPlan, windowStartISO }) {
+const MIN_GAP_MIN = 30;
+const MIN_GAP_MS = MIN_GAP_MIN * 60000;
   const days = splitIntoDays(windowStartISO, 7);
 
   // Busy intervals per day
@@ -297,6 +299,11 @@ function scheduleFromFreeSlots({ events, aiPlan, windowStartISO }) {
         });
 
         freeByDay[day] = consumeFreeSlot(freeByDay[day], slotStart, endMs);
+        freeByDay[day] = consumeFreeSlot(
+  freeByDay[day],
+  endMs,
+  Math.min(endMs + MIN_GAP_MS, clampDayWindow(day, 8, 22)[1])
+);
         subj.remaining -= allocMin;
         dailyMinutes[day] += allocMin;
         usedSubjectDay.add(keySD);

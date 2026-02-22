@@ -269,13 +269,7 @@ console.log("localStorage subjects:", localStorage.getItem("studyflow_subjects")
   <StudyPlanTasks sessions={planPreview?.weekly_study_plan || []} />
       <hr className="hr" />
 
-      <button
-        className="btnPrimary"
-        onClick={generateWeeklyPlan}
-        disabled={loadingPlan || subjects.length === 0}
-      >
-        {loadingPlan ? "Generating..." : "Generate Weekly Plan"}
-      </button>
+      
 
       {planPreview && (
         <div style={{ marginTop: 15 }}>
