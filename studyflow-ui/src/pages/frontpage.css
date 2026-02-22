@@ -15,6 +15,7 @@
   padding: 0 18px;
   background: #ffffff;
   border-bottom: 1px solid #e6e8ee;
+  margin-bottom: 8;
 }
 
 .brand {
@@ -89,9 +90,10 @@
 /* Workspace columns */
 .workspace {
   padding: 18px;
+  padding-top: 20px;
   display: grid;
   gap: 16px;
-  grid-template-columns: 1fr; /* mobile */
+  grid-template-columns: 1.6fr 1fr; /* mobile */
 }
 
 @media (min-width: 1100px) {
@@ -487,4 +489,136 @@
   background: #e6e8ee;
   border: none;
   margin: 8px 0;
+}
+.workspace2 {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+}
+
+.rightStack {
+  display: grid;
+  gap: 18px;
+}
+
+.emptyState {
+  padding: 18px;
+  border: 1px dashed #ddd;
+  border-radius: 12px;
+  opacity: 0.9;
+}
+
+.emptyTitle {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.emptySub {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.weekLegend {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: #666;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legendHint {
+  margin-left: auto;
+  font-size: 12px;
+  color: #888;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.dotEvent {
+  background: #c7c7c7;
+}
+
+.dotStudy {
+  background: #7c3aed; /* matches your purple theme */
+}
+.timeBlock {
+  border-radius: 10px;
+  padding: 6px 8px;
+  font-size: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+
+.timeBlockEvent {
+  background: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #111827;
+}
+
+.timeBlockStudy {
+  background: rgba(124,58,237,0.12);
+  border-color: rgba(124,58,237,0.35);
+  color: #2e1065;
+}
+
+.timeBlock.clickable {
+  cursor: pointer;
+}
+
+.timeBlock.clickable:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+}
+/* right column wrapper / panel */
+.rightColumn {
+  max-width: 520px;
+  justify-self: end;
+  width: 100%;
+}
+
+.accordion {
+  border: 1px solid #eee;
+  border-radius: 12px;
+  background: white;
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+
+.accordionSummary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 700;
+}
+
+.accordionSummary::-webkit-details-marker {
+  display: none;
+}
+
+.accordionHint {
+  font-weight: 500;
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.accordionBody {
+  padding: 12px 14px 14px;
+  border-top: 1px solid #eee;
 }

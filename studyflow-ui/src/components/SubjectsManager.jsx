@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function SubjectsManager({ onChange }) {
+export default function SubjectsManager({ onChange, hideTitle = false }) {
   const [subjects, setSubjects] = useState(() => {
     const raw = localStorage.getItem("studyflow_subjects");
     return raw ? JSON.parse(raw) : [];
@@ -18,7 +18,6 @@ export default function SubjectsManager({ onChange }) {
     const trimmed = name.trim();
     if (!trimmed) return;
 
-    // avoid duplicates
     if (subjects.some((s) => s.name.toLowerCase() === trimmed.toLowerCase())) {
       setName("");
       return;
@@ -42,19 +41,25 @@ export default function SubjectsManager({ onChange }) {
 
   return (
     <div className="subjectsBox">
-      <div className="subjectsHeader">Subjects</div>
+      {!hideTitle && <div className="subjectsHeader">Subjects</div>}
 
       <div className="row2">
         <label className="field">
           <div className="label">Subject</div>
-          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g., Physics" />
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g., Physics"
+          />
         </label>
 
         <label className="field">
           <div className="label">Difficulty (1–5)</div>
           <select value={difficulty} onChange={(e) => setDifficulty(e.target.value)}>
-            {[1,2,3,4,5].map((d) => (
-              <option key={d} value={d}>{d}</option>
+            {[1, 2, 3, 4, 5].map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
             ))}
           </select>
         </label>
@@ -78,8 +83,10 @@ export default function SubjectsManager({ onChange }) {
                   value={s.difficulty}
                   onChange={(e) => updateDifficulty(idx, e.target.value)}
                 >
-                  {[1,2,3,4,5].map((d) => (
-                    <option key={d} value={d}>Diff {d}</option>
+                  {[1, 2, 3, 4, 5].map((d) => (
+                    <option key={d} value={d}>
+                      Diff {d}
+                    </option>
                   ))}
                 </select>
 

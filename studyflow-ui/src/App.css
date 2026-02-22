@@ -40,3 +40,11 @@
 .read-the-docs {
   color: #888;
 }
+.chev {
+  opacity: 0.6;
+  transition: transform 0.15s ease;
+}
+
+details[open] .chev {
+  transform: rotate(180deg);
+}

@@ -11,7 +11,7 @@ const DOW = [
   { label: "Sun", val: "SU" },
 ];
 
-export default function AddClassForm({ subjects = [] }) {
+export default function AddClassForm({ subjects = [], hideTitle = false }) {
   const [subjectName, setSubjectName] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("MO");
   const [startTime, setStartTime] = useState("10:00");
@@ -61,7 +61,7 @@ export default function AddClassForm({ subjects = [] }) {
 
   return (
     <form onSubmit={onSubmit} className="formBox">
-      <div className="formTitle">Add Class / Subject Schedule</div>
+      {!hideTitle && <div className="formTitle">Add Class / Subject Schedule</div>}
 
       <label className="field">
         <div className="label">Subject</div>
@@ -83,7 +83,9 @@ export default function AddClassForm({ subjects = [] }) {
       </label>
 
       {/* Optional: show difficulty preview */}
-      <div className="hintText">Difficulty saved: {selectedDifficulty}</div>
+      {subjects.length > 0 && (
+        <div className="hintText">Difficulty saved: {selectedDifficulty}</div>
+      )}
 
       <label className="field">
         <div className="label">Day of week</div>
@@ -99,22 +101,38 @@ export default function AddClassForm({ subjects = [] }) {
       <div className="row2">
         <label className="field">
           <div className="label">Start</div>
-          <input type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+          <input
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+          />
         </label>
         <label className="field">
           <div className="label">End</div>
-          <input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+          <input
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+          />
         </label>
       </div>
 
       <div className="row2">
         <label className="field">
           <div className="label">First class date</div>
-          <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+          />
         </label>
         <label className="field">
           <div className="label">Until (semester end)</div>
-          <input type="date" value={untilDate} onChange={(e) => setUntilDate(e.target.value)} />
+          <input
+            type="date"
+            value={untilDate}
+            onChange={(e) => setUntilDate(e.target.value)}
+          />
         </label>
       </div>
 

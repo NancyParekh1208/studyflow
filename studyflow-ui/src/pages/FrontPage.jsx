@@ -1,10 +1,11 @@
 import "./frontpage.css";
 import SyncStatusCard from "../components/SyncStatusCard";
 import EventList from "../components/EventList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import MiniMonthCalendar from "../components/MiniMonthCalendar";
 import AddClassForm from "../components/AddClassForm";
 import SubjectsManager from "../components/SubjectsManager";
+import WeekTimeBoxCalendar from "../components/WeekTimeBoxCalendar";
 
 
 function TopBar() {
@@ -42,6 +43,7 @@ function Panel({ title, subtitle, children }) {
 export default function FrontPage() {
 
     const [planPreview, setPlanPreview] = useState(null); // { plan_id, weekly_study_plan, summary, window }
+    
     const [loadingPlan, setLoadingPlan] = useState(false);
     const [committingPlan, setCommittingPlan] = useState(false);
     const [activePlanId, setActivePlanId] = useState(() => localStorage.getItem("studyflow_active_plan_id") || null);
@@ -64,6 +66,8 @@ export default function FrontPage() {
                 })),
             };
 
+            console.log("Generating weekly plan... payload:", payload);
+
             const resp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/study-plan/preview`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -71,7 +75,10 @@ export default function FrontPage() {
                 body: JSON.stringify(payload),
             });
 
+            console.log("Preview status:", resp.status);
+
             const data = await resp.json();
+            console.log("Preview response data:", data);
             if (!resp.ok) throw new Error(data.error || "Failed to generate plan");
 
             setPlanPreview(data);
@@ -178,98 +185,162 @@ export default function FrontPage() {
     // ✅ ADD THIS
     const [subjects, setSubjects] = useState([]);
 
+    const [calendarEvents, setCalendarEvents] = useState([]);
+    const [loadingEvents, setLoadingEvents] = useState(false);
+   
+    useEffect(() => {
+  const raw = localStorage.getItem("studyflow_subjects");
+  if (raw) {
+    try {
+      setSubjects(JSON.parse(raw));
+    } catch (e) {
+      console.error("Bad subjects in localStorage", e);
+    }
+  }
+}, []);
+    useEffect(() => {
+    (async () => {
+        try {
+        setLoadingEvents(true);
+        const resp = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/calendar/events`, {
+            credentials: "include",
+        });
+        const data = await resp.json();
+        if (resp.ok) setCalendarEvents(data.items || []);
+        } catch (e) {
+        console.error("Failed to load calendar events", e);
+        } finally {
+        setLoadingEvents(false);
+        }
+    })();
+    }, []);
+
     return (
         <div className="shell">
             <TopBar />
+        {/* DEBUG BOX — remove later */}
+<div>
+  <div><b>planPreview:</b> {planPreview ? "✅ set" : "❌ null"}</div>
+  <div><b>sessions:</b> {planPreview?.weekly_study_plan?.length ?? 0}</div>
+  <div><b>subjects:</b> {subjects.length}</div>
+  <div><b>keys:</b> {planPreview ? Object.keys(planPreview).join(", ") : "-"}</div>
+</div>
+        <div className="workspace2">
+  {/* LEFT = Hero */}
+  <Panel title="Weekly Schedule" subtitle="Your calendar + study plan">
+    <SyncStatusCard />
+<hr className="hr" />
+  <div style={{ marginBottom: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
+                        <button
+                            className="btnPrimary"
+                            onClick={() => {
+                                if (subjects.length === 0) {
+                                    alert("Add at least 1 subject in Setup first.");
+                                    return;
+                                }
+                                generateWeeklyPlan();
+                            }}
+                            disabled={loadingPlan}
+                        >
+      {loadingPlan ? "Generating..." : "Generate Weekly Plan"}
+    </button>
 
-            <div className="workspace">
-                {/* Left */}
-                <Panel title="Schedule" subtitle="Your events and study sessions">
-                    <MiniMonthCalendar
-                        monthDate={monthDate}
-                        selectedDate={selectedDate}
-                        onChangeMonth={(delta) =>
-                            setMonthDate(
-                                (prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1)
-                            )
-                        }
-                        onSelectDate={(d) => setSelectedDate(d)}
-                    />
-                </Panel>
+    <button className="btnPrimary" onClick={acceptAndCommitPlan} disabled={!planPreview || committingPlan}>
+      {committingPlan ? "Adding..." : "Accept & Add to Calendar"}
+    </button>
 
-                {/* Middle */}
-                <Panel title="Upcoming Events" subtitle="Google Calendar events">
-                    <EventList />
-                    <hr className="hr" />
+    {activePlanId && (
+      <button className="btnGhost" onClick={replaceCommittedPlan} disabled={committingPlan}>
+        {committingPlan ? "Replacing..." : "Replace Existing Plan"}
+      </button>
+    )}
+  </div>
 
-                    <hr className="hr" />
+  <div style={{ height: 720, overflow: "hidden" }}>
+    <WeekTimeBoxCalendar
+      anchorDate={new Date(planPreview?.window?.start || Date.now())}
+      sessions={planPreview?.weekly_study_plan || []}
+      events={calendarEvents || []} // only if you have this state; otherwise remove
+    />
+  </div>
 
-                    <button className="btnPrimary" onClick={generateWeeklyPlan} disabled={loadingPlan || subjects.length === 0}>
-                        {loadingPlan ? "Generating..." : "Generate Weekly Plan"}
-                    </button>
+  {!planPreview && (
+    <div className="hintText" style={{ marginTop: 10 }}>
+      Generate a plan to see suggested study blocks placed into your real availability.
+    </div>
+  )}
+</Panel>
 
-                    {planPreview && (
-                        <div style={{ marginTop: 15 }}>
-                            <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
-                                <button className="btnPrimary" onClick={acceptAndCommitPlan} disabled={committingPlan}>
-                                    {committingPlan ? "Adding..." : "Accept & Add to Calendar"}
-                                </button>
+  {/* RIGHT = Everything else for now */}
+  <div className="rightStack">
+    <div className="rightColumn">
+    <Panel title="Upcoming Events" subtitle="Google Calendar events">
+      <EventList />
+      <hr className="hr" />
 
-                                {activePlanId && (
-                                    <button className="btnGhost" onClick={replaceCommittedPlan} disabled={committingPlan}>
-                                        {committingPlan ? "Replacing..." : "Replace Existing Plan"}
-                                    </button>
-                                )}
-                            </div>
+      <button
+        className="btnPrimary"
+        onClick={generateWeeklyPlan}
+        disabled={loadingPlan || subjects.length === 0}
+      >
+        {loadingPlan ? "Generating..." : "Generate Weekly Plan"}
+      </button>
 
-                            <h3 style={{ marginTop: 16 }}>Plan Preview</h3>
+      {planPreview && (
+        <div style={{ marginTop: 15 }}>
+          <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+            <button className="btnPrimary" onClick={acceptAndCommitPlan} disabled={committingPlan}>
+              {committingPlan ? "Adding..." : "Accept & Add to Calendar"}
+            </button>
 
-                            {planPreview.weekly_study_plan.map((s, idx) => (
-                                <div key={idx} style={{ marginBottom: 10, padding: 10, border: "1px solid #eee", borderRadius: 8 }}>
-                                    <strong>{s.title}</strong>
-                                    <div style={{ fontSize: 13, opacity: 0.85 }}>
-                                        {new Date(s.start).toLocaleString()} → {new Date(s.end).toLocaleString()}
-                                        {s.meta?.kind ? ` · ${s.meta.kind}` : ""}
-                                    </div>
-                                </div>
-                            ))}
+            {activePlanId && (
+              <button className="btnGhost" onClick={replaceCommittedPlan} disabled={committingPlan}>
+                {committingPlan ? "Replacing..." : "Replace Existing Plan"}
+              </button>
+            )}
+          </div>
 
-                            <h3 style={{ marginTop: 16 }}>Why this plan?</h3>
-                            {Object.entries(planPreview.summary || {}).map(([subject, info]) => (
-                                <div key={subject} style={{ marginBottom: 10 }}>
-                                    <strong>{subject}</strong>{" "}
-                                    <span style={{ opacity: 0.75 }}>
-                                        ({info.total_study_hours}h, {info.sessions} sessions, priority {info.priority ?? "—"})
-                                    </span>
-                                    <div style={{ opacity: 0.9 }}>{info.suggestion}</div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-
-                    {loadingSuggestions && <p style={{ marginTop: 10 }}>Generating suggestions...</p>}
-
-                    {suggestions && (
-                        <div style={{ marginTop: 15 }}>
-                            {Object.entries(suggestions).map(([subject, text]) => (
-                                <div key={subject} style={{ marginBottom: 12 }}>
-                                    <strong>{subject}</strong>
-                                    <p>{text}</p>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </Panel>
-
-                {/* Right (combined) */}
-                <Panel title="Connect Calendar" subtitle="Add subjects and sync class times">
-                    <SyncStatusCard />
-                    <hr className="hr" />
-                    <SubjectsManager onChange={setSubjects} />
-                    <hr className="hr" />
-                    <AddClassForm subjects={subjects} />
-                </Panel>
+          <h3 style={{ marginTop: 16 }}>Why this plan?</h3>
+          {Object.entries(planPreview.summary || {}).map(([subject, info]) => (
+            <div key={subject} style={{ marginBottom: 10 }}>
+              <strong>{subject}</strong>{" "}
+              <span style={{ opacity: 0.75 }}>
+                ({info.total_study_hours}h, {info.sessions} sessions, priority {info.priority ?? "—"})
+              </span>
+              <div style={{ opacity: 0.9 }}>{info.suggestion}</div>
             </div>
+          ))}
+        </div>
+      )}
+    </Panel>
+
+    <Panel title="Setup" subtitle="Add subjects and sync class times">
+                            <details className="accordion" open>
+                                <summary className="accordionSummary">
+                                    <div>
+                                        <div>Subjects</div>
+                                        <div className="accordionHint">Add & set difficulty</div>
+                                    </div>
+                                    <span className="chev">▾</span>
+                                </summary>
+                                <div className="accordionBody">
+                                    <SubjectsManager onChange={setSubjects} hideTitle />
+                                </div>
+                            </details>
+
+                            <details className="accordion">
+                                <summary className="accordionSummary">
+                                    <span>Add Class / Subject Schedule</span>
+                                    <span className="accordionHint">Optional</span>
+                                </summary>
+                                <div className="accordionBody">
+                                    <AddClassForm subjects={subjects} hideTitle />
+                                </div>
+                            </details>
+</Panel>
+  </div>
+  </div>
+</div>
         </div>
     );
 }
