@@ -29,6 +29,7 @@ function dayKey(iso) {
 
 export default function EventList() {
   const [items, setItems] = useState([]);
+  console.log(items)
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
 

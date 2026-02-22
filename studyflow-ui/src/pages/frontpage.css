@@ -268,3 +268,223 @@
   font-weight: 700;
   border-color: #6d28d9;
 }
+/* --- Focus Mode --- */
+.focusBox {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.focusHeaderRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.focusTitle {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.focusPill {
+  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid #e6e8ee;
+  background: #f6f7f9;
+  color: #374151;
+}
+
+.focusTime {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+}
+
+.focusPresets {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.chip {
+  border: 1px solid #e6e8ee;
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.chip.active {
+  background: #111;
+  color: #fff;
+  border-color: #111;
+}
+
+.chip:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.focusBar {
+  height: 10px;
+  background: #eef0f4;
+  border: 1px solid #e6e8ee;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.focusBarFill {
+  height: 100%;
+  background: #6d28d9;
+  width: 0%;
+  transition: width 0.25s ease;
+}
+
+.focusActions {
+  display: flex;
+  gap: 10px;
+}
+
+.nudgeBox {
+  border: 1px solid #e6e8ee;
+  background: #f6f7f9;
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.nudgeLabel {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.nudgeText {
+  font-size: 13px;
+  font-weight: 650;
+  color: #111;
+}
+
+.nudgeMeta {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #6b7280;
+}
+.formBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.formTitle {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.field .label {
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.field {
+  width: 100%;
+  min-width: 0;
+}
+
+.field input, .field select {
+  width: 100%;
+  padding: 10px 10px;
+  border: 1px solid #e6e8ee;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 13px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;              /* increased */
+  align-items: start;     /* keeps labels aligned */
+}
+
+.statusLine {
+  font-size: 12px;
+  color: #374151;
+  background: #f6f7f9;
+  border: 1px solid #e6e8ee;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.subjectsBox {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.subjectsHeader {
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.subjectsList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.subjectRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #e6e8ee;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #fff;
+}
+
+.subjectName {
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.subjectRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.miniSelect {
+  border: 1px solid #e6e8ee;
+  border-radius: 10px;
+  padding: 6px 8px;
+  background: #fff;
+  font-size: 12px;
+}
+
+.iconBtn {
+  border: 1px solid #e6e8ee;
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+.iconBtn:hover {
+  background: #f6f7f9;
+}
+
+.hintText {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.hr {
+  height: 1px;
+  background: #e6e8ee;
+  border: none;
+  margin: 8px 0;
+}
