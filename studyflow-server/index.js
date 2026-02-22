@@ -13,22 +13,22 @@ import fs from "fs";
 const TOKENS_PATH = "./tokens.json";
 
 function loadTokens() {
-  try {
-    if (fs.existsSync(TOKENS_PATH)) {
-      return JSON.parse(fs.readFileSync(TOKENS_PATH, "utf-8"));
+    try {
+        if (fs.existsSync(TOKENS_PATH)) {
+            return JSON.parse(fs.readFileSync(TOKENS_PATH, "utf-8"));
+        }
+    } catch (e) {
+        console.error("Failed to load tokens:", e);
     }
-  } catch (e) {
-    console.error("Failed to load tokens:", e);
-  }
-  return null;
+    return null;
 }
 
 function saveTokens(t) {
-  try {
-    fs.writeFileSync(TOKENS_PATH, JSON.stringify(t, null, 2));
-  } catch (e) {
-    console.error("Failed to save tokens:", e);
-  }
+    try {
+        fs.writeFileSync(TOKENS_PATH, JSON.stringify(t, null, 2));
+    } catch (e) {
+        console.error("Failed to save tokens:", e);
+    }
 }
 
 const DEMO_CALENDAR_ID =
@@ -69,85 +69,85 @@ const SCOPES = ["https://www.googleapis.com/auth/calendar.events"];
 // Google Calendar: fetch events (NON-MODULAR)
 // ------------------------------
 function normalizeEventsForPlanner(items) {
-  const out = [];
-  for (const ev of items || []) {
-    const title = ev.title || "(No title)";
-    const start = ev.start;
-    const end = ev.end;
-    if (!start || !end) continue;
+    const out = [];
+    for (const ev of items || []) {
+        const title = ev.title || "(No title)";
+        const start = ev.start;
+        const end = ev.end;
+        if (!start || !end) continue;
 
-    const dRaw = ev.difficulty;
-    const difficulty =
-      dRaw === null || dRaw === undefined || dRaw === ""
-        ? null
-        : Math.min(5, Math.max(1, Number(dRaw)));
+        const dRaw = ev.difficulty;
+        const difficulty =
+            dRaw === null || dRaw === undefined || dRaw === ""
+                ? null
+                : Math.min(5, Math.max(1, Number(dRaw)));
 
-    const type = ev.type || (difficulty ? "class" : "other");
+        const type = ev.type || (difficulty ? "class" : "other");
 
-    const isAllDayStart = typeof start === "string" && /^\d{4}-\d{2}-\d{2}$/.test(start);
-    const isAllDayEnd = typeof end === "string" && /^\d{4}-\d{2}-\d{2}$/.test(end);
+        const isAllDayStart = typeof start === "string" && /^\d{4}-\d{2}-\d{2}$/.test(start);
+        const isAllDayEnd = typeof end === "string" && /^\d{4}-\d{2}-\d{2}$/.test(end);
 
-    if (isAllDayStart && isAllDayEnd) {
-      out.push({
-        title,
-        start: `${start}T08:00:00`,
-        end: `${start}T22:00:00`,
-        difficulty,
-        type: "other",
-      });
-      continue;
+        if (isAllDayStart && isAllDayEnd) {
+            out.push({
+                title,
+                start: `${start}T08:00:00`,
+                end: `${start}T22:00:00`,
+                difficulty,
+                type: "other",
+            });
+            continue;
+        }
+
+        out.push({ title, start, end, difficulty, type });
     }
-
-    out.push({ title, start, end, difficulty, type });
-  }
-  return out;
+    return out;
 }
 
 async function fetchGoogleEvents({ timeMin, timeMax, calendarId = DEMO_CALENDAR_ID }) {
-  // Debug prints
-  console.log("\n[fetchGoogleEvents] called");
-  console.log("[fetchGoogleEvents] calendarId:", calendarId);
-  console.log("[fetchGoogleEvents] timeMin:", timeMin);
-  console.log("[fetchGoogleEvents] timeMax:", timeMax);
-  console.log("[fetchGoogleEvents] tokens present?:", !!tokens);
+    // Debug prints
+    console.log("\n[fetchGoogleEvents] called");
+    console.log("[fetchGoogleEvents] calendarId:", calendarId);
+    console.log("[fetchGoogleEvents] timeMin:", timeMin);
+    console.log("[fetchGoogleEvents] timeMax:", timeMax);
+    console.log("[fetchGoogleEvents] tokens present?:", !!tokens);
 
-  if (!tokens) {
-    const err = new Error("Not connected");
-    err.status = 401;
-    throw err;
-  }
+    if (!tokens) {
+        const err = new Error("Not connected");
+        err.status = 401;
+        throw err;
+    }
 
-  oauth2Client.setCredentials(tokens);
+    oauth2Client.setCredentials(tokens);
 
-  const calendar = google.calendar({ version: "v3", auth: oauth2Client });
+    const calendar = google.calendar({ version: "v3", auth: oauth2Client });
 
-  const resp = await calendar.events.list({
-    calendarId,
-    timeMin,
-    timeMax,
-    singleEvents: true,
-    orderBy: "startTime",
-    maxResults: 250,
-  });
+    const resp = await calendar.events.list({
+        calendarId,
+        timeMin,
+        timeMax,
+        singleEvents: true,
+        orderBy: "startTime",
+        maxResults: 250,
+    });
 
-  const mapped = (resp.data.items || []).map((ev) => {
-    const difficultyRaw = ev.extendedProperties?.private?.studyflow_difficulty ?? null;
-    const hasDifficulty = difficultyRaw !== null && difficultyRaw !== undefined && difficultyRaw !== "";
+    const mapped = (resp.data.items || []).map((ev) => {
+        const difficultyRaw = ev.extendedProperties?.private?.studyflow_difficulty ?? null;
+        const hasDifficulty = difficultyRaw !== null && difficultyRaw !== undefined && difficultyRaw !== "";
 
-    return {
-      id: ev.id,
-      title: ev.summary || "(No title)",
-      start: ev.start?.dateTime || ev.start?.date,
-      end: ev.end?.dateTime || ev.end?.date,
-      difficulty: hasDifficulty ? Number(difficultyRaw) : null,
-      type: hasDifficulty ? "class" : "other",
-    };
-  });
+        return {
+            id: ev.id,
+            title: ev.summary || "(No title)",
+            start: ev.start?.dateTime || ev.start?.date,
+            end: ev.end?.dateTime || ev.end?.date,
+            difficulty: hasDifficulty ? Number(difficultyRaw) : null,
+            type: hasDifficulty ? "class" : "other",
+        };
+    });
 
-  console.log("[fetchGoogleEvents] returned items:", mapped.length);
-  if (mapped[0]) console.log("[fetchGoogleEvents] first item sample:", mapped[0]);
+    console.log("[fetchGoogleEvents] returned items:", mapped.length);
+    if (mapped[0]) console.log("[fetchGoogleEvents] first item sample:", mapped[0]);
 
-  return mapped;
+    return mapped;
 }
 
 function buildPrompt(events) {
@@ -267,22 +267,22 @@ app.get("/auth/google/start", (req, res) => {
 });
 
 app.get("/auth/google/callback", async (req, res) => {
-  try {
-    const code = req.query.code;
-    if (!code) return res.redirect(`${process.env.FRONTEND_URL}?google=error`);
+    try {
+        const code = req.query.code;
+        if (!code) return res.redirect(`${process.env.FRONTEND_URL}?google=error`);
 
-    const { tokens: t } = await oauth2Client.getToken(code);
+        const { tokens: t } = await oauth2Client.getToken(code);
 
-    tokens = t;
-    oauth2Client.setCredentials(tokens);
-    saveTokens(tokens);   // ← THIS IS CRITICAL
-    console.log("[oauth callback] tokens saved. has refresh_token?:", !!tokens.refresh_token);
+        tokens = t;
+        oauth2Client.setCredentials(tokens);
+        saveTokens(tokens);   // ← THIS IS CRITICAL
+        console.log("[oauth callback] tokens saved. has refresh_token?:", !!tokens.refresh_token);
 
-    return res.redirect(`${process.env.FRONTEND_URL}?google=connected`);
-  } catch (e) {
-    console.error("OAuth callback error:", e);
-    res.redirect(`${process.env.FRONTEND_URL}?google=error`);
-  }
+        return res.redirect(`${process.env.FRONTEND_URL}?google=connected`);
+    } catch (e) {
+        console.error("OAuth callback error:", e);
+        res.redirect(`${process.env.FRONTEND_URL}?google=error`);
+    }
 });
 
 app.get("/api/auth/status", (req, res) => {
@@ -294,19 +294,19 @@ app.get("/api/auth/status", (req, res) => {
 // ----------------------------------------------------------------
 
 app.get("/api/calendar/events", async (req, res) => {
-  try {
-    if (!tokens) return res.status(401).json({ error: "Not connected" });
+    try {
+        if (!tokens) return res.status(401).json({ error: "Not connected" });
 
-    const timeMin = req.query.timeMin || new Date().toISOString();
-    const timeMax =
-      req.query.timeMax || new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+        const timeMin = req.query.timeMin || new Date().toISOString();
+        const timeMax =
+            req.query.timeMax || new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
 
-    const items = await fetchGoogleEvents({ timeMin, timeMax, calendarId: DEMO_CALENDAR_ID });
-    res.json({ items });
-  } catch (e) {
-    console.error("[/api/calendar/events] error:", e);
-    res.status(e.status || 500).json({ error: e.message || "Failed to fetch events" });
-  }
+        const items = await fetchGoogleEvents({ timeMin, timeMax, calendarId: DEMO_CALENDAR_ID });
+        res.json({ items });
+    } catch (e) {
+        console.error("[/api/calendar/events] error:", e);
+        res.status(e.status || 500).json({ error: e.message || "Failed to fetch events" });
+    }
 });
 // ----------------------------------------------------------------
 // Create recurring class event (unchanged behavior)
@@ -386,7 +386,7 @@ app.post("/api/study-plan/suggestions", async (req, res) => {
             const tMax =
                 timeMax || new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
 
-            
+
 
             plannerEvents = normalizeEventsForPlanner(fetched);
         } else if (Array.isArray(events)) {
@@ -439,182 +439,206 @@ app.get("/api/test-openai", async (req, res) => {
 // Preview endpoint
 
 app.post("/api/study-plan/preview", async (req, res) => {
-  try {
-    const { useCalendar = true, timeMin, timeMax, calendarId } = req.body || {};
-    const subjects = normalizeSubjects(req.body?.subjects);
+    try {
+        const { useCalendar = true, timeMin, timeMax, calendarId } = req.body || {};
+        let subjects = normalizeSubjects(req.body?.subjects);
 
-    if (!subjects.length) return res.status(400).json({ error: "subjects[] required" });
+        const tMin = timeMin || new Date().toISOString();
+        const tMax = timeMax || new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
 
-    const tMin = timeMin || new Date().toISOString();
-    const tMax = timeMax || new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+        const fetched = useCalendar
+            ? await fetchGoogleEvents({
+                timeMin: tMin,
+                timeMax: tMax,
+                calendarId: calendarId || DEMO_CALENDAR_ID,
+            })
+            : [];
 
-    const fetched = useCalendar
-      ? await fetchGoogleEvents({
-          google,
-          oauth2Client,
-          tokens,
-          calendarId: calendarId || DEMO_CALENDAR_ID,
-          timeMin: tMin,
-          timeMax: tMax,
-        })
-      : [];
+        const plannerEvents = normalizeEventsForPlanner(fetched);
 
-    const plannerEvents = normalizeEventsForPlanner(fetched);
+        // ✅ FALLBACK: derive subjects from calendar "class" events with difficulty
+        if (!subjects.length && useCalendar) {
+            const map = new Map();
+            for (const ev of plannerEvents) {
+                if (ev.type === "class" && ev.difficulty) {
+                    // Use title as subject name
+                    if (!map.has(ev.title)) map.set(ev.title, ev.difficulty);
+                }
+            }
+            subjects = Array.from(map.entries()).map(([title, difficulty]) => ({ title, difficulty }));
+        }
 
-    const aiPlan = await aiOptimizeAllocation({
-      subjects,
-      windowStartISO: tMin,
-      windowEndISO: tMax,
-      openaiKey: process.env.OPENAI_API_KEY,
-    });
+        if (!subjects.length) {
+            return res.status(400).json({
+                error: "No subjects found. Add subjects in Setup or tag classes with difficulty in calendar.",
+            });
+        }
 
-    // Safety clamp if AI forgets a subject
-    const aiTitles = new Set((aiPlan.subjects || []).map((x) => x.title));
-    for (const s of subjects) {
-      if (!aiTitles.has(s.title)) {
-        aiPlan.subjects = aiPlan.subjects || [];
-        aiPlan.subjects.push({
-          title: s.title,
-          priority: 50,
-          target_minutes: defaultMinutesForDifficulty(s.difficulty),
-          strategy: { prefer_after_class: true, distribution: "spaced", review_ratio: 0.2 },
-          one_line_tip: "Focus on practice and review briefly.",
+        const aiPlan = await aiOptimizeAllocation({
+            subjects,
+            windowStartISO: tMin,
+            windowEndISO: tMax,
+            openaiKey: process.env.OPENAI_API_KEY,
         });
-      }
+
+        // Safety clamp if AI forgets a subject
+        const aiTitles = new Set((aiPlan.subjects || []).map((x) => x.title));
+        for (const s of subjects) {
+            if (!aiTitles.has(s.title)) {
+                aiPlan.subjects = aiPlan.subjects || [];
+                aiPlan.subjects.push({
+                    title: s.title,
+                    priority: 50,
+                    target_minutes: defaultMinutesForDifficulty(s.difficulty),
+                    strategy: { prefer_after_class: true, distribution: "spaced", review_ratio: 0.2 },
+                    one_line_tip: "Focus on practice and review briefly.",
+                });
+            }
+        }
+
+        const { sessions, subjects: finalSubjects } = scheduleFromFreeSlots({
+            events: plannerEvents,
+            aiPlan,
+            windowStartISO: tMin,
+        });
+
+        const planId = `PLAN_${Math.random().toString(36).slice(2, 10)}`;
+
+        const summary = {};
+        for (const subj of finalSubjects) {
+            const these = sessions.filter((x) => x.title === subj.title);
+            const minutes = these.reduce((acc, x) => acc + (toMs(x.end) - toMs(x.start)) / 60000, 0);
+
+            const orig = subjects.find((s) => s.title === subj.title);
+
+            summary[subj.title] = {
+                difficulty: difficultyToBand(orig?.difficulty ?? 3),
+                total_study_hours: Math.round((minutes / 60) * 10) / 10,
+                sessions: these.length,
+                suggestion: subj.tip || "Balanced across the week based on priority.",
+                priority: subj.priority,
+            };
+        }
+
+        res.json({
+            plan_id: planId,
+            window: { start: tMin, end: tMax },
+            weekly_study_plan: sessions,
+            summary,
+            ai_allocation: aiPlan,
+        });
+    } catch (e) {
+        console.error("Preview failed:", e);
+        res.status(e.status || 500).json({ error: e.message || "Failed to preview plan" });
     }
-
-    const { sessions, subjects: finalSubjects } = scheduleFromFreeSlots({
-      events: plannerEvents,
-      aiPlan,
-      windowStartISO: tMin,
-    });
-
-    const planId = `PLAN_${Math.random().toString(36).slice(2, 10)}`;
-
-    const summary = {};
-    for (const subj of finalSubjects) {
-      const these = sessions.filter((x) => x.title === subj.title);
-      const minutes = these.reduce((acc, x) => acc + (toMs(x.end) - toMs(x.start)) / 60000, 0);
-
-      const orig = subjects.find((s) => s.title === subj.title);
-
-      summary[subj.title] = {
-        difficulty: difficultyToBand(orig?.difficulty ?? 3),
-        total_study_hours: Math.round((minutes / 60) * 10) / 10,
-        sessions: these.length,
-        suggestion: subj.tip || "Balanced across the week based on priority.",
-        priority: subj.priority,
-      };
-    }
-
-    res.json({
-      plan_id: planId,
-      window: { start: tMin, end: tMax },
-      weekly_study_plan: sessions,
-      summary,
-      ai_allocation: aiPlan,
-    });
-  } catch (e) {
-    console.error("Preview failed:", e);
-    res.status(e.status || 500).json({ error: e.message || "Failed to preview plan" });
-  }
 });
 
 // commit endpoint
 
 app.post("/api/study-plan/commit", async (req, res) => {
-  try {
-    const { plan_id, weekly_study_plan, calendarId = DEMO_CALENDAR_ID, timezone = "America/New_York" } = req.body || {};
+    try {
+        const { plan_id, weekly_study_plan, calendarId = DEMO_CALENDAR_ID, timezone = "America/New_York" } = req.body || {};
 
-    if (!plan_id || !Array.isArray(weekly_study_plan) || weekly_study_plan.length === 0) {
-      return res.status(400).json({ error: "plan_id and weekly_study_plan[] required" });
+        if (!plan_id || !Array.isArray(weekly_study_plan) || weekly_study_plan.length === 0) {
+            return res.status(400).json({ error: "plan_id and weekly_study_plan[] required" });
+        }
+
+        const ids = await commitStudyPlan({
+            google,
+            oauth2Client,
+            tokens,
+            calendarId,
+            timezone,
+            planId: plan_id,
+            sessions: weekly_study_plan,
+        });
+
+        res.json({ ok: true, inserted: ids.length, eventIds: ids });
+    } catch (e) {
+        console.error("Commit failed:", e);
+        res.status(e.status || 500).json({ error: e.message || "Failed to commit plan" });
     }
-
-    const ids = await commitStudyPlan({
-      google,
-      oauth2Client,
-      tokens,
-      calendarId,
-      timezone,
-      planId: plan_id,
-      sessions: weekly_study_plan,
-    });
-
-    res.json({ ok: true, inserted: ids.length, eventIds: ids });
-  } catch (e) {
-    console.error("Commit failed:", e);
-    res.status(e.status || 500).json({ error: e.message || "Failed to commit plan" });
-  }
 });
 
 // Recalulate endpoint
 
 app.post("/api/study-plan/recalculate", async (req, res) => {
-  try {
-    const { previous_plan_id, mode = "preview", calendarId = DEMO_CALENDAR_ID } = req.body || {};
-    const subjects = normalizeSubjects(req.body?.subjects);
+    try {
+        const { previous_plan_id, mode = "preview", calendarId = DEMO_CALENDAR_ID } = req.body || {};
+        const subjects = normalizeSubjects(req.body?.subjects);
 
-    if (!subjects.length) return res.status(400).json({ error: "subjects[] required" });
+        if (!subjects.length) return res.status(400).json({ error: "subjects[] required" });
 
-    const tMin = new Date().toISOString();
-    const tMax = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
+        const tMin = new Date().toISOString();
+        const tMax = new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
 
-    const fetched = await fetchGoogleEvents({
-      google,
-      oauth2Client,
-      tokens,
-      calendarId,
-      timeMin: tMin,
-      timeMax: tMax,
-    });
+        const fetched = await fetchGoogleEvents({
+            google,
+            oauth2Client,
+            tokens,
+            calendarId,
+            timeMin: tMin,
+            timeMax: tMax,
+        });
 
-    const plannerEvents = normalizeEventsForPlanner(fetched);
+        if (useCalendar) {
+            const tMin = timeMin || new Date().toISOString();
+            const tMax = timeMax || new Date(Date.now() + 7 * 24 * 3600 * 1000).toISOString();
 
-    const aiPlan = await aiOptimizeAllocation({
-      subjects,
-      windowStartISO: tMin,
-      windowEndISO: tMax,
-      openaiKey: process.env.OPENAI_API_KEY,
-    });
+            const fetched = await fetchGoogleEvents({
+                timeMin: tMin,
+                timeMax: tMax,
+                calendarId: calendarId || DEMO_CALENDAR_ID,
+            });
 
-    const { sessions } = scheduleFromFreeSlots({
-      events: plannerEvents,
-      aiPlan,
-      windowStartISO: tMin,
-    });
+            plannerEvents = normalizeEventsForPlanner(fetched);
+        }
 
-    const newPlanId = `PLAN_${Math.random().toString(36).slice(2, 10)}`;
+        const aiPlan = await aiOptimizeAllocation({
+            subjects,
+            windowStartISO: tMin,
+            windowEndISO: tMax,
+            openaiKey: process.env.OPENAI_API_KEY,
+        });
 
-    if (mode === "preview") {
-      return res.json({ plan_id: newPlanId, weekly_study_plan: sessions, ai_allocation: aiPlan });
+        const { sessions } = scheduleFromFreeSlots({
+            events: plannerEvents,
+            aiPlan,
+            windowStartISO: tMin,
+        });
+
+        const newPlanId = `PLAN_${Math.random().toString(36).slice(2, 10)}`;
+
+        if (mode === "preview") {
+            return res.json({ plan_id: newPlanId, weekly_study_plan: sessions, ai_allocation: aiPlan });
+        }
+
+        let deleted = 0;
+        if (previous_plan_id) {
+            deleted = await deletePlanEvents({
+                google,
+                oauth2Client,
+                tokens,
+                calendarId,
+                planId: previous_plan_id,
+            });
+        }
+
+        const ids = await commitStudyPlan({
+            google,
+            oauth2Client,
+            tokens,
+            calendarId,
+            timezone: "America/New_York",
+            planId: newPlanId,
+            sessions,
+        });
+
+        res.json({ ok: true, deleted, inserted: ids.length, new_plan_id: newPlanId });
+    } catch (e) {
+        console.error("Recalculate failed:", e);
+        res.status(e.status || 500).json({ error: e.message || "Failed to recalculate plan" });
     }
-
-    let deleted = 0;
-    if (previous_plan_id) {
-      deleted = await deletePlanEvents({
-        google,
-        oauth2Client,
-        tokens,
-        calendarId,
-        planId: previous_plan_id,
-      });
-    }
-
-    const ids = await commitStudyPlan({
-      google,
-      oauth2Client,
-      tokens,
-      calendarId,
-      timezone: "America/New_York",
-      planId: newPlanId,
-      sessions,
-    });
-
-    res.json({ ok: true, deleted, inserted: ids.length, new_plan_id: newPlanId });
-  } catch (e) {
-    console.error("Recalculate failed:", e);
-    res.status(e.status || 500).json({ error: e.message || "Failed to recalculate plan" });
-  }
 });
 
 // ----------------------------------------------------------------

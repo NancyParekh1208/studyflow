@@ -6,6 +6,7 @@ import MiniMonthCalendar from "../components/MiniMonthCalendar";
 import AddClassForm from "../components/AddClassForm";
 import SubjectsManager from "../components/SubjectsManager";
 import WeekTimeBoxCalendar from "../components/WeekTimeBoxCalendar";
+import StudyPlanTasks from "../components/StudyPlanTasks";
 
 
 function TopBar() {
@@ -14,10 +15,6 @@ function TopBar() {
             <div className="brand">
                 <div className="brandIcon">🧠</div>
                 <div className="brandName">StudyFlow AI</div>
-            </div>
-
-            <div className="topActions">
-                <button className="btnPrimary">+ Add Event</button>
             </div>
 
             <div className="userArea">
@@ -60,7 +57,7 @@ export default function FrontPage() {
             const payload = {
                 useCalendar: true,
                 subjects: subjects.map((s) => ({
-                    title: s.name,
+                    title: s.title ?? s.name,
                     difficulty: s.difficulty,
                     // examDate, weakTopics can be added later
                 })),
@@ -189,6 +186,8 @@ export default function FrontPage() {
     const [loadingEvents, setLoadingEvents] = useState(false);
    
     useEffect(() => {
+console.log("subjects state:", subjects);
+console.log("localStorage subjects:", localStorage.getItem("studyflow_subjects"));
   const raw = localStorage.getItem("studyflow_subjects");
   if (raw) {
     try {
@@ -218,26 +217,17 @@ export default function FrontPage() {
     return (
         <div className="shell">
             <TopBar />
-        {/* DEBUG BOX — remove later */}
-<div>
-  <div><b>planPreview:</b> {planPreview ? "✅ set" : "❌ null"}</div>
-  <div><b>sessions:</b> {planPreview?.weekly_study_plan?.length ?? 0}</div>
-  <div><b>subjects:</b> {subjects.length}</div>
-  <div><b>keys:</b> {planPreview ? Object.keys(planPreview).join(", ") : "-"}</div>
-</div>
+          
         <div className="workspace2">
   {/* LEFT = Hero */}
   <Panel title="Weekly Schedule" subtitle="Your calendar + study plan">
-    <SyncStatusCard />
-<hr className="hr" />
+      <SyncStatusCard />
+   <hr className="hr" />
   <div style={{ marginBottom: 10, display: "flex", gap: 10, flexWrap: "wrap" }}>
                         <button
                             className="btnPrimary"
                             onClick={() => {
-                                if (subjects.length === 0) {
-                                    alert("Add at least 1 subject in Setup first.");
-                                    return;
-                                }
+                                
                                 generateWeeklyPlan();
                             }}
                             disabled={loadingPlan}
@@ -275,7 +265,8 @@ export default function FrontPage() {
   <div className="rightStack">
     <div className="rightColumn">
     <Panel title="Upcoming Events" subtitle="Google Calendar events">
-      <EventList />
+      {/* NEW: Study tasks list from the generated plan */}
+  <StudyPlanTasks sessions={planPreview?.weekly_study_plan || []} />
       <hr className="hr" />
 
       <button
